@@ -1,0 +1,9 @@
+config MTK_STK8BA50
+	bool "MTK_STK8BA50 for MediaTek package"
+	default n
+	help
+	  The MTK_STK8BA50 is a highly integrated,
+	  low power internal measurement unit
+	  that provides precise acceleration
+	  measurement.
+	  this config will turn on accelerometer feature.
