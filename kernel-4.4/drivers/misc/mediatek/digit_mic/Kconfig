@@ -1,0 +1,8 @@
+
+config BIDE_DIGIT_MIC
+	bool "BIDE_DIGIT_MIC"
+	help
+	  BIDE_DIGIT_MIC
+
+source "drivers/misc/mediatek/digit_mic/ac108/Kconfig"
+

@@ -1,0 +1,5 @@
+
+config BIDE_DIGIT_MIC_AC108
+	bool "BIDE_DIGIT_MIC_AC108"
+	default n
+

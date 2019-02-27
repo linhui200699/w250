@@ -1,0 +1,2 @@
+
+obj-$(CONFIG_BIDE_DIGIT_MIC_AC108) += ac108/
