@@ -106,14 +106,6 @@
 
 #define FRM_UPDATE_SEQ_CACHE_NUM (DISP_INTERNAL_BUFFER_COUNT+1)
 
-
-
-
-#if defined(CONFIG_SPI_LCM_SUPPORT)
-extern atomic_t trigger_spiCap_enable_flag;
-extern void lcm_spiCap_trigger(int wakeup);
-#endif
-
 static struct disp_internal_buffer_info *decouple_buffer_info[DISP_INTERNAL_BUFFER_COUNT];
 
 static struct RDMA_CONFIG_STRUCT decouple_rdma_config;
@@ -192,6 +184,12 @@ static int dvfs_last_ovl_req = HRT_LEVEL_HPM;
 static atomic_t delayed_trigger_kick = ATOMIC_INIT(0);
 static atomic_t od_trigger_kick = ATOMIC_INIT(0);
 
+#ifdef CONFIG_SPI_LCM_SUPPORT//by yoyo
+extern atomic_t trigger_spiCap_thread_flag;
+extern wait_queue_head_t trigger_spiCap_thread_wq;
+extern void notify_spi_lklogo(void);
+extern void lcm_hook_primary_display_trigger(int blocking);
+#endif
 #define pgc    _get_context()
 
 static int smart_ovl_try_switch_mode_nolock(void);
@@ -3173,7 +3171,9 @@ int primary_display_init(char *lcm_name, unsigned int lcm_fps, int is_lcm_inited
 	int use_cmdq = disp_helper_get_option(DISP_OPT_USE_CMDQ);
 	struct disp_ddp_path_config *data_config;
 	struct ddp_io_golden_setting_arg gset_arg;
-
+#ifdef CONFIG_SPI_LCM_SUPPORT//by yoyo for spi lcd at 20180604
+        notify_spi_lklogo();
+#endif
 	DISPCHECK("primary_display_init begin lcm=%s, inited=%d\n", lcm_name, is_lcm_inited);
 
 	dprec_init();
@@ -3901,10 +3901,8 @@ int suspend_to_full_roi(void)
 int primary_display_suspend(void)
 {
 	enum DISP_STATUS ret = DISP_STATUS_OK;
-
-#if defined(CONFIG_SPI_LCM_SUPPORT)
-	printk("\n<SPI>  %s(),line[%d]\n",__func__,__LINE__);
-	atomic_set(&trigger_spiCap_enable_flag, 0);
+#ifdef CONFIG_SPI_LCM_SUPPORT//by yoyo for spi lcd at 20180604
+	atomic_set(&trigger_spiCap_thread_flag, 0);
 #endif
 	
 	
@@ -4048,6 +4046,9 @@ done:
 
 	aee_kernel_wdt_kick_Powkey_api("mtkfb_early_suspend", WDT_SETBY_Display);
 	primary_trigger_cnt = 0;
+#ifdef CONFIG_SPI_LCM_SUPPORT//by yoyo for spi lcd at 20180604
+	atomic_set(&trigger_spiCap_thread_flag, 0);
+#endif
 	mmprofile_log_ex(ddp_mmp_get_events()->primary_suspend, MMPROFILE_FLAG_END, 0, 0);
 	DISPCHECK("primary_display_suspend end\n");
 
@@ -4397,13 +4398,6 @@ done:
 
 	aee_kernel_wdt_kick_Powkey_api("mtkfb_late_resume", WDT_SETBY_Display);
 	mmprofile_log_ex(ddp_mmp_get_events()->primary_resume, MMPROFILE_FLAG_END, 0, 0);
-	
-#if defined(CONFIG_SPI_LCM_SUPPORT)
-	printk("\n<SPI>  %s(),line[%d]\n",__func__,__LINE__);
-	atomic_set(&trigger_spiCap_enable_flag, 1);
-#endif
-	
-	
 	return ret;
 }
 
@@ -4573,12 +4567,27 @@ done:
 
 	if (pgc->session_id > 0)
 		update_frm_seq_info(0, 0, 0, FRM_TRIGGER);
-	
-	
-#if defined(CONFIG_SPI_LCM_SUPPORT)
+#ifdef CONFIG_SPI_LCM_SUPPORT//by yoyo for spi lcd at 20180604
+		// joya john
+	if((primary_display_is_decouple_mode()) ||primary_display_is_mirror_mode())
+//	if (_is_decouple_mode(pgc->session_mode))
+	{
+		; //do nothing
+	}
+	else //if(blocking)
+	{
+#ifdef DEBUG_SPI_LCM
+	printk("zhunengqin-00000--%s\n\n",__func__);
+#endif
+		lcm_hook_primary_display_trigger(blocking); //yoyo
+#ifdef DEBUG_SPI_LCM
+	printk("zhunengqin-111111--%s\n\n",__func__);
+#endif
+	}
 	if (pgc->state == DISP_ALIVE) {
-		lcm_spiCap_trigger(atomic_read(&trigger_spiCap_enable_flag));
-		printk("\n<SPI>  Into %s\n",__func__);
+			atomic_set(&trigger_spiCap_thread_flag, 1);
+			wake_up_interruptible(&trigger_spiCap_thread_wq);
+			printk("func[%s],line[%d]\n",__func__,__LINE__);
 	}
 #endif
 

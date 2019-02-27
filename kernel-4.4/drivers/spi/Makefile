@@ -10,6 +10,13 @@ ifeq ($(CONFIG_TRUSTONIC_TEE_SUPPORT),y)
 endif
 subdir-ccflags-y += -I$(srctree)/drivers/misc/mediatek/base/power/$(MTK_PLATFORM)
 ccflags-y += -I$(srctree)/drivers/misc/mediatek/include/mt-plat/
+ccflags-y += -I$(srctree)/drivers/misc/mediatek/video/mt6739/videox/
+ccflags-y += -I$(srctree)/drivers/misc/mediatek/video/mt6739/dispsys/
+ccflags-y += -I$(srctree)/drivers/misc/mediatek/video/include/
+ccflags-y += -I$(srctree)/drivers/misc/mediatek/lcm/inc/
+ccflags-y += -I$(srctree)/drivers/misc/mediatek/cmdq/v3/
+ccflags-y += -I$(srctree)/drivers/misc/mediatek/cmdq/v3/mt6739/
+ccflags-y += -I$(srctree)/drivers/misc/mediatek/m4u/mt6739/
 # small core, mostly translating board-specific
 # config declarations into driver model code
 obj-$(CONFIG_SPI_MASTER)		+= spi.o

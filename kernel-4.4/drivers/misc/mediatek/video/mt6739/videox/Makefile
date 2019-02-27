@@ -90,6 +90,7 @@ ifeq ($(MTK_MIRAVISION_SUPPORT), yes)
     ccflags-y += -DCONFIG_FOR_SOURCE_PQ
 endif
 
+ccflags-y += -DCONFIG_SPI_LCM_SUPPORT
 #ccflags-y += -DNO_SPM
 
 ccflags-$(CONFIG_MTK_LCM_DEVICE_TREE_SUPPORT) += -DMTK_LCM_DEVICE_TREE_SUPPORT

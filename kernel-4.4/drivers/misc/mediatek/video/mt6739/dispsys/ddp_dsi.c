@@ -1263,7 +1263,7 @@ static void _DSI_PHY_clk_setting(enum DISP_MODULE_ENUM module, struct cmdqRecStr
 			pcw_ratio    = 8;
 			txdiv0       = 2;
 			txdiv1       = 1;
-			} else if (data_Rate >= 10) {
+			} else if (data_Rate >= 75) {
 			pcw_ratio    = 16;
 			txdiv0       = 2;
 			txdiv1       = 2;
@@ -2488,9 +2488,9 @@ int ddp_dsi_set_lcm_utils(enum DISP_MODULE_ENUM module, LCM_DRIVER *lcm_drv)
 	utils->set_gpio_lcd_enp_bias = lcd_enp_bias_setting;
 #endif
 #endif
-
+#ifndef CONFIG_SPI_LCM_SUPPORT//by yoyo for spi lcd for test
 	lcm_drv->set_util_funcs(utils);
-
+#endif
 	return 0;
 }
 

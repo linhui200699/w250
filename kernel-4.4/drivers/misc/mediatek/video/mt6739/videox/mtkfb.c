@@ -66,7 +66,10 @@
 #include "disp_recovery.h"
 #include "ddp_clkmgr.h"
 #include "ddp_log.h"
-
+#ifdef CONFIG_SPI_LCM_SUPPORT
+atomic_t trigger_spiCap_thread_flag = ATOMIC_INIT(0);
+DECLARE_WAIT_QUEUE_HEAD(trigger_spiCap_thread_wq);
+#endif
 /* static variable */
 static u32 MTK_FB_XRES;
 static u32 MTK_FB_YRES;

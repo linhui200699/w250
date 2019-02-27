@@ -369,7 +369,7 @@ void disp_helper_option_init(void)
 	disp_helper_set_option(DISP_OPT_ESD_CHECK_RECOVERY, 1);
 	disp_helper_set_option(DISP_OPT_ESD_CHECK_SWITCH, 1);
 
-#if defined(CONFIG_SPI_LCM_SUPPORT)
+#ifdef CONFIG_SPI_LCM_SUPPORT//add by yoyo for spi lcd
 	disp_helper_set_option(DISP_OPT_BYPASS_OVL, 0);
 #else
 	disp_helper_set_option(DISP_OPT_BYPASS_OVL, 1);
